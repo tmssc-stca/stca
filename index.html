@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STCA 班級交流空間 | STCA Class Hub</title>
+  <!-- 載入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 載入 Google Fonts: Noto Sans TC 與 Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- 載入 Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            accent: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-100 selection:text-indigo-700">
+
+  <!-- Toast 訊息提示框 -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- 每月 1 號香港公共圖書館風格系統維護橫幅 -->
+  <div id="hkpl-maintenance-banner" class="hidden bg-amber-900 text-amber-50 border-b border-amber-700/80 px-4 py-3 text-xs sm:text-sm shadow-md relative z-50">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <div class="flex items-start gap-2.5">
+        <span class="bg-amber-400 text-amber-950 font-bold px-2 py-0.5 rounded text-[11px] shrink-0 mt-0.5">系統維護通告</span>
+        <p class="leading-relaxed">
+          為提升服務質素，本網站將於每月一日進行例行系統維護及伺服器更新。維護期間，所有網上互動服務（包括登入系統、發布動態、留言回應、功課更新及資料上載）將會暫停。不便之處，敬請原諒。
+        </p>
+      </div>
+      <button onclick="openMaintenanceModal()" class="shrink-0 text-xs font-bold underline text-amber-200 hover:text-white">
+        查看完整通告
+      </button>
+    </div>
+  </div>
+
+  <!-- 香港公共圖書館風格系統維護全屏通告視窗 (Modal) -->
+  <div id="maintenance-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/75 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-fade-in">
+      <div class="bg-amber-800 px-6 py-4 flex items-center justify-between text-white">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="wrench" class="w-5 h-5 text-amber-300"></i>
+          <h3 class="font-bold text-base tracking-wide">STCA 班級交流網站 — 系統維護通告</h3>
+        </div>
+        <button onclick="closeMaintenanceModal()" class="text-amber-200 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4 text-sm text-slate-700 leading-relaxed">
+        <div class="bg-amber-50 border-l-4 border-amber-600 p-4 rounded-r-xl space-y-2.5 text-slate-800">
+          <p class="font-bold text-amber-950 text-base">【系統維護通告】</p>
+          <p>
+            為提升服務質素，本網站將於<strong>每月一日</strong>進行例行系統維護及伺服器更新。維護期間，所有網上互動服務（包括登入系統、發布動態、留言回應、功課更新及資料上載）將會暫停。不便之處，敬請原諒。
+          </p>
+          <p class="text-xs text-slate-600 pt-1">
+            如有查詢，請聯絡 STCA 班級管理員（永晞）。
+          </p>
+        </div>
+        <div class="flex items-center justify-between pt-2 text-xs text-slate-500">
+          <span>STCA（智能科技與電腦應用班）技術支援組</span>
+          <button onclick="closeMaintenanceModal()" class="px-4 py-2 rounded-xl font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors">
+            我知道了（僅瀏覽靜態內容）
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 成員帳號密碼登入對話框 (Login Modal) -->
+  <div id="login-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-5 animate-fade-in relative">
+      <button onclick="toggleLoginModal(false)" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white font-bold text-2xl flex items-center justify-center mx-auto shadow-lg shadow-indigo-200">
+          ST
+        </div>
+        <h3 class="font-bold text-slate-900 text-xl tracking-tight">STCA 成員帳號登入</h3>
+        <p class="text-xs text-slate-500">請選擇班級成員並輸入登入密碼以解鎖互動權限</p>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">1. 選擇登入成員</label>
+          <select id="login-user-select" onchange="updateLoginHint()" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:bg-white focus:border-indigo-500 focus:outline-none">
+            <!-- 由 JS 動態填入成員清單 -->
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-bold text-slate-700">2. 輸入密碼</label>
+            <span id="login-password-hint" class="text-[11px] text-indigo-600 font-medium"></span>
+          </div>
+          <div class="relative">
+            <input type="password" id="login-password-input" required placeholder="請輸入您的登入密碼..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 pr-10 text-sm focus:bg-white focus:border-indigo-500 focus:outline-none">
+            <button type="button" onclick="togglePasswordVisibility('login-password-input')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <p id="login-error-msg" class="hidden text-xs text-rose-600 font-semibold mt-1.5"></p>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm shadow-md shadow-indigo-200 transition-all">
+          驗證密碼並登入
+        </button>
+      </form>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+        <span class="text-slate-400">一般學生密碼每 30 天須更換一次</span>
+        <button onclick="toggleLoginModal(false)" class="font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1.5 rounded-lg hover:bg-slate-100">訪客繼續瀏覽</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 更改密碼對話框 (支援強制每月更新 & 主動修改密碼) -->
+  <div id="change-password-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 space-y-5 animate-fade-in relative">
+      <button id="close-change-pw-btn" onclick="closeChangePasswordModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-100 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="space-y-1.5">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800" id="pw-modal-badge">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> 密碼安全更新
+        </div>
+        <h3 class="font-bold text-slate-900 text-lg" id="pw-modal-title">更改登入密碼</h3>
+        <p class="text-xs text-slate-500 leading-relaxed" id="pw-modal-desc">
+          依 STCA 班級資安規定，學生帳號每個月（30 天）必須更換一次密碼以確保帳號安全。
+        </p>
+      </div>
+
+      <form onsubmit="handleChangePasswordSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">目前舊密碼</label>
+          <input type="password" id="old-password-input" required placeholder="請輸入目前使用的密碼" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-sm focus:bg-white focus:border-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">設定新密碼（至少 6 位，須包含英文及數字）</label>
+          <input type="password" id="new-password-input" required placeholder="例如：stca2026" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-sm focus:bg-white focus:border-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">確認新密碼</label>
+          <input type="password" id="confirm-password-input" required placeholder="請再次輸入新密碼" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-sm focus:bg-white focus:border-indigo-500 focus:outline-none">
+        </div>
+
+        <p id="change-pw-error" class="hidden text-xs text-rose-600 font-semibold"></p>
+
+        <div class="pt-2 flex items-center gap-2.5">
+          <button type="button" id="cancel-change-pw-btn" onclick="closeChangePasswordModal()" class="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">取消</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">確認更新密碼</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 頂部導航欄 (Navbar) -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-3">
+        
+        <!-- 左側：班級標誌與名稱 -->
+        <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="switchTab('feed')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-indigo-200">
+            ST
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-bold text-slate-900 text-base sm:text-lg tracking-tight">STCA 班級交流空間</h1>
+              <span id="cloud-sync-badge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>全班雲端即時同步中</span>
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 hidden sm:block">團結・活力・共同成長（管理員變更全班即時同步）</p>
+          </div>
+        </div>
+
+        <!-- 中間：桌面版導航切換 -->
+        <nav id="desktop-nav" class="hidden lg:flex items-center space-x-1 bg-slate-100/80 p-1 rounded-2xl">
+          <!-- 由 JS 動態渲染 -->
+        </nav>
+
+        <!-- 右側：身分登入狀態與管理員工具 -->
+        <div class="flex items-center gap-1.5 sm:gap-2.5">
+          <!-- 全域系統維護開關（僅管理員永晞可操作，變更後全班即時同步） -->
+          <button id="toggle-maintenance-btn" onclick="toggleSimulatedMaintenance()" title="管理員全域系統維護開關（變更後全班即時同步）" class="hidden items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-semibold border border-amber-200 bg-amber-50/80 text-amber-800 hover:bg-amber-100 transition-colors">
+            <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
+            <span class="hidden md:inline" id="maintenance-btn-label">開啟全域維護</span>
+          </button>
+
+          <div id="auth-status-container" class="flex items-center">
+            <!-- 由 JS 動態渲染：未登入按鈕 vs 已登入身分卡 -->
+          </div>
+
+          <button id="admin-reset-btn" onclick="openResetModal()" title="管理員重置全班預設資料" class="hidden p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors" aria-label="重置全班資料">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 手機與平板版水平捲動導航列 -->
+      <nav id="mobile-nav" class="flex lg:hidden items-center gap-1.5 overflow-x-auto no-scrollbar py-2 border-t border-slate-100">
+        <!-- 由 JS 動態渲染 -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主要內容區塊 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- ==================== 1. 動態牆 (FEED) ==================== -->
+    <section id="section-feed" class="tab-section grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+      
+      <!-- 左/中欄：發文框 + 篩選 + 貼文列表 -->
+      <div class="lg:col-span-8 space-y-5">
+        
+        <!-- 發布新貼文卡片 (未登入時顯示鎖定提示) -->
+        <div id="composer-container" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5">
+          <!-- 由 JS 根據登入狀態動態渲染發文區或登入提示 -->
+        </div>
+
+        <!-- 搜尋與標籤篩選器 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-3.5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="feed-filter-tabs">
+            <button onclick="setFeedFilter('ALL')" data-filter="ALL" class="feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white shrink-0 transition-colors">全部動態</button>
+            <button onclick="setFeedFilter('#日常閒聊')" data-filter="#日常閒聊" class="feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 shrink-0 transition-colors">#日常閒聊</button>
+            <button onclick="setFeedFilter('#課業討論')" data-filter="#課業討論" class="feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 shrink-0 transition-colors">#課業討論</button>
+            <button onclick="setFeedFilter('#活動揪團')" data-filter="#活動揪團" class="feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 shrink-0 transition-colors">#活動揪團</button>
+            <button onclick="setFeedFilter('#失物招領')" data-filter="#失物招領" class="feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 shrink-0 transition-colors">#失物招領</button>
+          </div>
+          
+          <div class="relative sm:w-56">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="feed-search" oninput="renderFeed()" placeholder="搜尋貼文關鍵字..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- 貼文列表容器 -->
+        <div id="feed-list" class="space-y-4">
+          <!-- 由 JS 動態渲染 -->
+        </div>
+      </div>
+
+      <!-- 右欄：班級快速看板 (側邊欄) -->
+      <aside class="lg:col-span-4 space-y-5">
+        <!-- 置頂重要公告摘要 -->
+        <div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-5 text-white shadow-md shadow-indigo-200/70">
+          <div class="flex items-center justify-between mb-3">
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-1 rounded-lg">
+              <i data-lucide="pin" class="w-3.5 h-3.5 text-amber-300"></i> 置頂班務提醒
+            </span>
+            <button onclick="switchTab('announcements')" class="text-xs text-indigo-100 hover:text-white underline">查看全部</button>
+          </div>
+          <div id="sidebar-pinned-announcement" class="space-y-2">
+            <!-- 由 JS 渲染 -->
+          </div>
+        </div>
+
+        <!-- 個人功課完成度小工具 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i> 近期功課進度
+            </h3>
+            <button onclick="switchTab('homework')" class="text-xs text-indigo-600 font-semibold hover:underline">前往清單</button>
+          </div>
+          <div id="sidebar-hw-progress" class="space-y-3">
+            <!-- 由 JS 渲染 -->
+          </div>
+        </div>
+
+        <!-- 今日值日生與小統計 -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+          <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-3">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i> STCA 今日班務小卡
+          </h3>
+          <div class="grid grid-cols-2 gap-3 text-center">
+            <div class="bg-amber-50/80 border border-amber-100 rounded-xl p-3">
+              <p class="text-[11px] text-amber-700 font-medium">今日值日生</p>
+              <p class="text-sm font-bold text-slate-800 mt-1">岳林・芯而</p>
+            </div>
+            <div class="bg-indigo-50/80 border border-indigo-100 rounded-xl p-3">
+              <p class="text-[11px] text-indigo-700 font-medium">距離期中考</p>
+              <p class="text-sm font-bold text-indigo-700 mt-1">倒數 12 天</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ==================== 2. 班級公告 (ANNOUNCEMENTS) ==================== -->
+    <section id="section-announcements" class="tab-section hidden space-y-6 animate-fade-in">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="megaphone" class="w-5 h-5 text-indigo-600"></i> STCA 班級公告欄
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">掌握智能科技與電腦應用班重要時程與通知（僅管理員「永晞」可發布或刪除公告）</p>
+        </div>
+        <div id="announcement-action-area">
+          <!-- 根據身分動態顯示 -->
+        </div>
+      </div>
+
+      <!-- 新增公告表單 -->
+      <div id="new-announcement-form" class="hidden bg-indigo-50/60 border border-indigo-200 rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-indigo-950 text-sm flex items-center gap-2">
+            <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i> 發布新班級公告
+          </h3>
+          <button onclick="toggleAnnouncementForm(false)" class="text-slate-400 hover:text-slate-600">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">公告標題</label>
+            <input type="text" id="ann-title" placeholder="例如：下週五班際籃球賽集合時間通知" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">重要程度</label>
+            <select id="ann-priority" class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+              <option value="pinned">📌 置頂重要通知</option>
+              <option value="normal">📢 一般班務公告</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">詳細內容</label>
+          <textarea id="ann-content" rows="3" placeholder="請輸入完整通知事項、截止時間或注意事項..." class="w-full rounded-xl border border-slate-200 bg-white p-3.5 text-sm focus:border-indigo-500 focus:outline-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="toggleAnnouncementForm(false)" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200/70">取消</button>
+          <button type="button" onclick="addAnnouncement()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm">確認發布公告</button>
+        </div>
+      </div>
+
+      <!-- 公告卡片列表 -->
+      <div id="announcements-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 由 JS 動態渲染 -->
+      </div>
+    </section>
+
+    <!-- ==================== 3. 功課與行事曆 (HOMEWORK & SCHEDULE) ==================== -->
+    <section id="section-homework" class="tab-section hidden space-y-6 animate-fade-in">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- 左側：功課與考試清單 (佔 7 欄) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="book-open-check" class="w-5 h-5 text-indigo-600"></i> 近期功課與小考清單
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">登入後可勾選個人完成進度與新增作業</p>
+              </div>
+              <span id="hw-completion-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                已完成 0 / 0 項
+              </span>
+            </div>
+
+            <!-- 進度條 -->
+            <div class="w-full bg-slate-100 rounded-full h-2.5 mb-5 overflow-hidden">
+              <div id="hw-progress-bar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <!-- 新增功課表單 (未登入時提示) -->
+            <div id="hw-composer-wrapper">
+              <!-- 由 JS 動態渲染 -->
+            </div>
+
+            <!-- 功課項目列表 -->
+            <div id="homework-list" class="space-y-2.5 mt-4">
+              <!-- 由 JS 動態渲染 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側：每週課表預覽 (佔 5 欄) -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+    <!-- ==================== 3. 功課清單 (HOMEWORK) ==================== -->
+    <section id="section-homework" class="tab-section hidden space-y-6 animate-fade-in">
+      <div class="max-w-4xl mx-auto">
+        <!-- 功課與考試清單 -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="book-open-check" class="w-5 h-5 text-indigo-600"></i> 近期功課與小考清單
+              </h2>
+              <p class="text-xs text-slate-500 mt-0.5">登入後可勾選進度與新增作業；管理員「永晞」取消之項目全班即時同步移除</p>
+            </div>
+            <span id="hw-completion-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+              已完成 0 / 0 項
+            </span>
+          </div>
+
+          <!-- 進度條 -->
+          <div class="w-full bg-slate-100 rounded-full h-2.5 mb-5 overflow-hidden">
+            <div id="hw-progress-bar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+
+          <!-- 新增功課表單 (未登入時提示) -->
+          <div id="hw-composer-wrapper">
+            <!-- 由 JS 動態渲染 -->
+          </div>
+
+          <!-- 功課項目列表 -->
+          <div id="homework-list" class="space-y-2.5 mt-4">
+            <!-- 由 JS 動態渲染 -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. 資源分享區 (RESOURCES) ==================== -->
+    <section id="section-resources" class="tab-section hidden space-y-6 animate-fade-in">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="folder-heart" class="w-5 h-5 text-indigo-600"></i> 學習筆記與班級資源庫
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">匯集各科重點整理、歷屆考古題與班級活動相簿雲端連結</p>
+        </div>
+        <div id="resource-action-area">
+          <!-- 由 JS 根據登入狀態渲染 -->
+        </div>
+      </div>
+
+      <!-- 資源分類篩選 -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar" id="resource-filters">
+        <button onclick="setResourceFilter('ALL')" data-rcat="ALL" class="res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white shrink-0">全部資源</button>
+        <button onclick="setResourceFilter('中文/國文')" data-rcat="中文/國文" class="res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shrink-0">📖 中文/國文</button>
+        <button onclick="setResourceFilter('英文')" data-rcat="英文" class="res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shrink-0">🔤 英文</button>
+        <button onclick="setResourceFilter('數學')" data-rcat="數學" class="res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shrink-0">📐 數學</button>
+        <button onclick="setResourceFilter('理科')" data-rcat="理科" class="res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shrink-0">🔬 理科</button>
+        <button onclick="setResourceFilter('班級相簿')" data-rcat="班級相簿" class="res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shrink-0">📸 班級相簿</button>
+      </div>
+
+      <!-- 新增資源折疊表單 -->
+      <div id="new-resource-panel" class="hidden bg-white border-2 border-indigo-200 rounded-2xl p-5 shadow-md space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-slate-800 text-sm">新增學習筆記或相簿連結</h3>
+          <button onclick="toggleResourceModal(false)" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <form onsubmit="addResource(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">資源名稱</label>
+            <input type="text" id="res-title" required placeholder="例如：高二數學向量總複習筆記 PDF" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">所屬分類</label>
+            <select id="res-category" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+              <option value="中文/國文">中文/國文</option>
+              <option value="英文">英文</option>
+              <option value="數學">數學</option>
+              <option value="理科">理科</option>
+              <option value="班級相簿">班級相簿</option>
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">資源簡介</label>
+            <input type="text" id="res-desc" required placeholder="簡短說明內容重點或適用考試範圍..." class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">雲端 / 網頁連結 (URL)</label>
+            <input type="url" id="res-url" required value="https://drive.google.com/" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div class="sm:col-span-2 flex justify-end gap-2 pt-1">
+            <button type="button" onclick="toggleResourceModal(false)" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">取消</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-700">儲存並分享</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 資源卡片網格 -->
+      <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- 由 JS 動態渲染 -->
+      </div>
+    </section>
+
+    <!-- ==================== 5. 班級通訊錄 (CLASSMATES) ==================== -->
+    <section id="section-classmates" class="tab-section hidden space-y-6 animate-fade-in">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> STCA 班級通訊錄
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">認識班上每一位夥伴！可搜尋姓名、職務或共同興趣標籤</p>
+        </div>
+        <div class="relative sm:w-72">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="classmate-search" oninput="renderClassmates()" placeholder="搜尋姓名、座號或興趣 (如: 籃球、程式)..." class="w-full pl-10 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none">
+        </div>
+      </div>
+
+      <div id="classmates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- 由 JS 動態渲染 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 頁尾 -->
+  <footer class="bg-white border-t border-slate-200/80 py-5 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+      <div class="flex flex-wrap items-center gap-2">
+        <p>© 2026 STCA 班級交流空間・每月 1 日進行系統例行維護</p>
+        <button onclick="openMaintenanceModal()" class="text-indigo-500 hover:underline font-medium">查看維護通告</button>
+      </div>
+      <p id="footer-auth-status">目前狀態：訪客瀏覽模式 (未登入)</p>
+    </div>
+  </footer>
+
+  <!-- 重置資料確認 Modal -->
+  <div id="reset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 space-y-4 animate-fade-in">
+      <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <div class="text-center space-y-1.5">
+        <h3 class="font-bold text-slate-900 text-base">確定要重置全班雲端資料嗎？</h3>
+        <p class="text-xs text-slate-500 leading-relaxed">此操作僅限管理員「永晞」執行，將會把全班所有人的貼文、公告、功課與資源同步恢復成預設範例內容。</p>
+      </div>
+      <div class="flex items-center gap-2.5 pt-2">
+        <button onclick="closeResetModal()" class="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">取消</button>
+        <button onclick="confirmResetData()" class="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700 transition-colors">確定全班重置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase 雲端即時同步引擎 + 應用程式邏輯 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // ==========================================
+    // 1. 預設資料與狀態初始化 (雲端即時同步版)
+    // ==========================================
+    const SESSION_USER_KEY = 'stca_session_user_id';
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+    let db = null;
+    let auth = null;
+    let sharedDocRef = null;
+    let isCloudReady = false;
+
+    const DEFAULT_CLASSMATES = [
+      {
+        id: 'u_yongxi',
+        seat: '01',
+        name: '永晞',
+        role: '管理員',
+        isOfficer: true,
+        password: 'swscwh200610',
+        passwordUpdatedAt: Date.now(),
+        avatarBg: 'bg-amber-500',
+        bio: 'STCA 智能科技與電腦應用班網站管理員，負責維護班級交流平台與發布重要班務通知，有任何系統或班級問題歡迎隨時提出！',
+        interests: ['系統管理', 'AI 應用', '網頁開發'],
+        ig: '@yongxi_stca',
+        discord: 'yongxi_admin#0001'
+      },
+      {
+        id: 'u_yuelin',
+        seat: '02',
+        name: '岳林',
+        role: '一般同學',
+        isOfficer: false,
+        password: 'stca0000',
+        passwordUpdatedAt: Date.now(),
+        avatarBg: 'bg-indigo-600',
+        bio: '喜歡研究硬體組裝與物聯網專題，下課有空歡迎一起討論專題點子或打場球！',
+        interests: ['物聯網 IoT', '籃球', '3C硬體'],
+        ig: '@yuelin_02',
+        discord: 'yuelin#1024'
+      },
+      {
+        id: 'u_xiner',
+        seat: '03',
+        name: '芯而',
+        role: '一般同學',
+        isOfficer: false,
+        password: 'stca0000',
+        passwordUpdatedAt: Date.now(),
+        avatarBg: 'bg-rose-500',
+        bio: '熱愛 UI/UX 視覺設計與數位插畫，筆記整理控一枚 ✨ 歡迎大家一起交流學習心得！',
+        interests: ['UI設計', '數位插畫', '咖啡廳探店'],
+        ig: '@xiner_art',
+        discord: 'xiner#2048'
+      },
+      {
+        id: 'u_mingzhong',
+        seat: '04',
+        name: '銘中',
+        role: '一般同學',
+        isOfficer: false,
+        password: 'stca0000',
+        passwordUpdatedAt: Date.now(),
+        avatarBg: 'bg-emerald-600',
+        bio: '對演算法解題與 Python 程式設計很有興趣，數理或程式作業卡關可以一起研究 💪',
+        interests: ['Python', '演算法', '羽球'],
+        ig: '@mingzhong_dev',
+        discord: 'mingzhong#4096'
+      },
+      {
+        id: 'u_mingxi',
+        seat: '05',
+        name: '明曦',
+        role: '一般同學',
+        isOfficer: false,
+        password: 'stca0000',
+        passwordUpdatedAt: Date.now(),
+        avatarBg: 'bg-sky-600',
+        bio: '喜歡攝影、剪輯與音樂創作，負責幫大家記錄 STCA 班上的各種精彩日常 📸',
+        interests: ['影音剪輯', '攝影', '手搖飲控'],
+        ig: '@mingxi_cam',
+        discord: 'mingxi#8192'
+      }
+    ];
+
+    const DEFAULT_POSTS = [
+      {
+        id: 'p1',
+        authorId: 'u_yongxi',
+        authorName: '永晞',
+        authorRole: '管理員',
+        avatarBg: 'bg-amber-500',
+        tag: '#日常閒聊',
+        content: '歡迎大家來到「STCA 智能科技與電腦應用班」專屬交流網站！🎉 之後班上的重要公告、功課清單與學習筆記都會即時同步更新在這裡，請各位同學登入後多多發文互動喔！',
+        card: { emoji: '🚀', title: 'STCA 班級交流空間正式啟用', desc: '全班雲端即時同步・歡迎岳林、芯而、銘中、明曦加入' },
+        timestamp: '1 小時前',
+        likes: 5,
+        likedByUsers: [],
+        comments: [
+          { id: 'c1', authorId: 'u_xiner', authorName: '芯而', authorRole: '一般同學', text: '介面好漂亮！以後查功課跟筆記方便超多 ✨', time: '45 分鐘前' },
+          { id: 'c2', authorId: 'u_yuelin', authorName: '岳林', authorRole: '一般同學', text: '感謝永晞管理員架設網站，太強啦！👍', time: '30 分鐘前' }
+        ]
+      },
+      {
+        id: 'p2',
+        authorId: 'u_mingzhong',
+        authorName: '銘中',
+        authorRole: '一般同學',
+        avatarBg: 'bg-emerald-600',
+        tag: '#課業討論',
+        content: '提醒大家下週二的《資訊科技與 Python 程式設計》實作小考，我把迴圈與串列應用的練習題重點整理放到【資源分享區】了，登入後大家可以一起討論看看！💻',
+        card: { emoji: '📚', title: '考前衝刺讀書會', desc: 'Python 基礎語法與邏輯題型整理' },
+        timestamp: '3 小時前',
+        likes: 4,
+        likedByUsers: [],
+        comments: [
+          { id: 'c3', authorId: 'u_mingxi', authorName: '明曦', authorRole: '一般同學', text: '剛好有幾題迴圈不太熟，馬上去下載來看，謝謝銘中！', time: '2 小時前' }
+        ]
+      },
+      {
+        id: 'p3',
+        authorId: 'u_mingxi',
+        authorName: '明曦',
+        authorRole: '一般同學',
+        avatarBg: 'bg-sky-600',
+        tag: '#活動揪團',
+        content: '今天放學 17:10 大家要不要一起去喝手搖飲順便討論下個月資訊專題的分組方向？想跟團的同學登入後在下面留言 +1 🧋',
+        card: { emoji: '🧋', title: '團購手搖飲時間', desc: '放學後小組腦力激盪交流' },
+        timestamp: '昨天 16:40',
+        likes: 4,
+        likedByUsers: [],
+        comments: [
+          { id: 'c4', authorId: 'u_yuelin', authorName: '岳林', authorRole: '一般同學', text: '+1！我剛好有幾個感測器專題的想法想跟大家聊', time: '昨天 17:05' }
+        ]
+      }
+    ];
+
+    const DEFAULT_ANNOUNCEMENTS = [
+      {
+        id: 'a1',
+        title: '📌 STCA 班級交流網站正式啟用與使用規範',
+        content: '各位同學好，本網站為智能科技與電腦應用班（STCA）專屬交流平台。請大家先點擊右上角登入後，善用動態牆與資源分享區進行互動，若有重要班務通知將由管理員置頂發布。',
+        author: '永晞 (管理員)',
+        date: '2026-11-18',
+        priority: 'pinned'
+      },
+      {
+        id: 'a2',
+        title: '💻 本學期智能科技專題分組名單確認提醒',
+        content: '請岳林、芯而、銘中、明曦於本週五放學前確認各自的專題題目與負責分工，並將企劃書初稿上傳至班級雲端資料夾。',
+        author: '永晞 (管理員)',
+        date: '2026-11-17',
+        priority: 'pinned'
+      },
+      {
+        id: 'a3',
+        title: '📢 下週班會課主題：期中考讀書計畫與資訊競賽分享',
+        content: '下週五第 7 節班會課將進行期中考前複習規劃與資訊應用競賽經驗分享，請大家準時出席。',
+        author: '永晞 (管理員)',
+        date: '2026-11-15',
+        priority: 'normal'
+      }
+    ];
+
+    const DEFAULT_HOMEWORK = [
+      { id: 'h1', subject: '資訊科技', task: 'Python 基礎資料結構與迴圈練習題 (Lab 04)', due: '2026-11-20', completed: true },
+      { id: 'h2', subject: '數學', task: '習作 Ch3-2 平面向量內積練習題 (P.45-48)', due: '2026-11-22', completed: false },
+      { id: 'h3', subject: '英文', task: '背誦 Unit 6 科技主題單字片語 + 準備下週一聽寫', due: '2026-11-23', completed: false },
+      { id: 'h4', subject: '物理/理化', task: '基礎電學與感測器原理實驗報告', due: '2026-11-25', completed: false }
+    ];
+
+    const DEFAULT_RESOURCES = [
+      {
+        id: 'r1',
+        title: 'Python 程式設計核心語法與考古題精選筆記',
+        category: '理科',
+        desc: '整理迴圈、函式與串列處理常見考題與解題邏輯說明。',
+        author: '銘中 (一般同學)',
+        date: '2026-11-18',
+        url: 'https://drive.google.com/'
+      },
+      {
+        id: 'r2',
+        title: 'STCA 智能科技與電腦應用班日常活動相簿',
+        category: '班級相簿',
+        desc: '收錄永晞、岳林、芯而、銘中、明曦的課堂專題實作與合照花絮！',
+        author: '明曦 (一般同學)',
+        date: '2026-11-14',
+        url: 'https://photos.google.com/'
+      },
+      {
+        id: 'r3',
+        title: '高二數學 Ch3 平面向量視覺化重點心智圖',
+        category: '數學',
+        desc: '用圖解方式快速理解向量內積與投影公式，考前衝刺必備。',
+        author: '芯而 (一般同學)',
+        date: '2026-11-11',
+        url: 'https://docs.google.com/'
+      },
+      {
+        id: 'r4',
+        title: 'STCA 班級共用雲端資源與軟體安裝指南',
+        category: '英文',
+        desc: '包含開發環境設定教學與科技英文專有名詞對照表。',
+        author: '永晞 (管理員)',
+        date: '2026-11-08',
+        url: 'https://drive.google.com/'
+      }
+    ];
+
+    // 全域狀態：預設為未登入 (currentUser = null)，共享資料由 Firestore 即時驅動
+    let appState = {
+      currentTab: 'feed',
+      currentUser: null, // 僅存在本機 sessionStorage，各裝置獨立登入身分
+      pendingForcePwUser: null,
+      simulatedMaintenance: false, // 雲端同步的全域維護狀態
+      selectedPostTag: '#日常閒聊',
+      selectedMoodCard: null,
+      feedFilter: 'ALL',
+      resourceFilter: 'ALL',
+      posts: JSON.parse(JSON.stringify(DEFAULT_POSTS)),
+      announcements: JSON.parse(JSON.stringify(DEFAULT_ANNOUNCEMENTS)),
+      homework: JSON.parse(JSON.stringify(DEFAULT_HOMEWORK)),
+      resources: JSON.parse(JSON.stringify(DEFAULT_RESOURCES)),
+      classmates: JSON.parse(JSON.stringify(DEFAULT_CLASSMATES))
+    };
+
+    // 判斷目前是否處於「每月 1 號系統維護中」或「管理員開啟全域維護」
+    function isMaintenanceActive() {
+      const isFirstDayOfMonth = new Date().getDate() === 1;
+      return isFirstDayOfMonth || appState.simulatedMaintenance;
+    }
+
+    function updateSyncBadge(status) {
+      const badge = document.getElementById('cloud-sync-badge');
+      if (!badge) return;
+      if (status === 'connected') {
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>全班雲端即時同步中</span>';
+      } else if (status === 'syncing') {
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200';
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span><span>正在連線全班資料庫...</span>';
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200';
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>離線模式</span>';
+      }
+    }
+
+    async function initCloudSync() {
+      updateSyncBadge('syncing');
+      try {
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'stca-class-hub-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        if (!firebaseConfig) {
+          throw new Error('找不到 Firebase 設定');
+        }
+
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // 必須先完成身分驗證再進行任何 Firestore 操作
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        if (!auth.currentUser) {
+          throw new Error('Firebase 驗證失敗');
+        }
+
+        // 嚴格遵循路徑規範：/artifacts/{appId}/public/data/stca_global/main_state
+        sharedDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stca_global', 'main_state');
+
+        // 檢查雲端是否已有初始資料，若無則建立一次初始資料庫（之後刪除的內容不會再復活）
+        const initialSnap = await getDoc(sharedDocRef);
+        if (!initialSnap.exists()) {
+          await setDoc(sharedDocRef, {
+            simulatedMaintenance: false,
+            classmates: DEFAULT_CLASSMATES,
+            posts: DEFAULT_POSTS,
+            announcements: DEFAULT_ANNOUNCEMENTS,
+            homework: DEFAULT_HOMEWORK,
+            resources: DEFAULT_RESOURCES,
+            updatedAt: Date.now()
+          });
+        }
+
+        // 建立即時監聽器：任何一人（特別是永晞管理員）做出的刪除、取消或修改，全班所有人即時收到並重繪！
+        onSnapshot(sharedDocRef, (snapshot) => {
+          if (!snapshot.exists()) return;
+          const data = snapshot.data();
+
+          appState.simulatedMaintenance = Boolean(data.simulatedMaintenance);
+          appState.classmates = Array.isArray(data.classmates) ? data.classmates : JSON.parse(JSON.stringify(DEFAULT_CLASSMATES));
+          appState.posts = Array.isArray(data.posts) ? data.posts : [];
+          appState.announcements = Array.isArray(data.announcements) ? data.announcements : [];
+          appState.homework = Array.isArray(data.homework) ? data.homework : [];
+          appState.resources = Array.isArray(data.resources) ? data.resources : [];
+
+          // 同步恢復本機 sessionStorage 登入身分（管理員於維護期間仍可登入解除維護，一般學生於維護期間自動登出）
+          const savedSessionId = sessionStorage.getItem(SESSION_USER_KEY);
+          if (savedSessionId) {
+            const matchedUser = appState.classmates.find(u => u.id === savedSessionId) || null;
+            if (matchedUser && (!isMaintenanceActive() || matchedUser.isOfficer)) {
+              appState.currentUser = matchedUser;
+            } else {
+              appState.currentUser = null;
+              sessionStorage.removeItem(SESSION_USER_KEY);
+            }
+          } else {
+            appState.currentUser = null;
+          }
+
+          isCloudReady = true;
+          updateSyncBadge('connected');
+          refreshAllUI();
+        }, (err) => {
+          console.error('雲端即時監聽發生錯誤：', err);
+          updateSyncBadge('offline');
+        });
+      } catch (e) {
+        console.error('初始化雲端同步失敗：', e);
+        updateSyncBadge('offline');
+        refreshAllUI();
+      }
+    }
+
+    // 將全班共享狀態寫回雲端 Firestore，讓所有成員與訪客立即同步
+    async function saveSharedStateToCloud() {
+      if (!sharedDocRef || !auth?.currentUser) {
+        showToast('雲端尚未連線完成，請稍候再試！', 'warning');
+        return;
+      }
+      try {
+        await setDoc(sharedDocRef, {
+          simulatedMaintenance: appState.simulatedMaintenance,
+          classmates: appState.classmates,
+          posts: appState.posts,
+          announcements: appState.announcements,
+          homework: appState.homework,
+          resources: appState.resources,
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error('寫入雲端資料失敗：', e);
+        showToast('雲端同步更新失敗，請檢查網路連線', 'warning');
+      }
+    }
+
+    // 檢查互動前是否受「每月 1 號維護」或「未登入」限制
+    function ensureCanInteract(actionDesc = '進行此操作') {
+      if (isMaintenanceActive() && (!appState.currentUser || !appState.currentUser.isOfficer)) {
+        openMaintenanceModal();
+        showToast('系統例行維護期間，網上互動服務暫停。', 'warning');
+        return false;
+      }
+      if (!appState.currentUser) {
+        toggleLoginModal(true);
+        showToast(`請先登入 STCA 成員帳號才能${actionDesc}！`, 'warning');
+        return false;
+      }
+      return true;
+    }
+
+    // ==========================================
+    // 2. 維護模式、導航與帳號密碼登入系統
+    // ==========================================
+    function updateMaintenanceUI() {
+      const active = isMaintenanceActive();
+      const banner = document.getElementById('hkpl-maintenance-banner');
+      const btn = document.getElementById('toggle-maintenance-btn');
+      const btnLabel = document.getElementById('maintenance-btn-label');
+      const resetBtn = document.getElementById('admin-reset-btn');
+      const isAdmin = appState.currentUser && appState.currentUser.isOfficer;
+
+      // 僅管理員「永晞」可操作全域維護開關與全班重置按鈕
+      if (isAdmin) {
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+        resetBtn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+        resetBtn.classList.add('hidden');
+      }
+
+      if (active) {
+        banner.classList.remove('hidden');
+        if (isAdmin) {
+          btn.className = 'inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-bold border border-amber-500 bg-amber-500 text-white shadow-xs transition-colors';
+          btnLabel.textContent = '關閉全域維護';
+        }
+      } else {
+        banner.classList.add('hidden');
+        if (isAdmin) {
+          btn.className = 'inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-semibold border border-amber-200 bg-amber-50/80 text-amber-800 hover:bg-amber-100 transition-colors';
+          btnLabel.textContent = '開啟全域維護';
+        }
+      }
+    }
+
+    async function toggleSimulatedMaintenance() {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) {
+        showToast('僅管理員「永晞」可切換全班系統維護狀態！', 'warning');
+        return;
+      }
+      if (new Date().getDate() === 1) {
+        showToast('今日為每月 1 日，系統正處於正式例行維護日。', 'warning');
+        openMaintenanceModal();
+        return;
+      }
+      appState.simulatedMaintenance = !appState.simulatedMaintenance;
+      await saveSharedStateToCloud();
+      if (appState.simulatedMaintenance) {
+        showToast('已開啟全班全域維護模式，所有同學畫面已同步進入維護狀態！', 'warning');
+      } else {
+        closeMaintenanceModal();
+        showToast('已結束全班維護狀態，全班已同步恢復正常服務！');
+      }
+    }
+
+    function openMaintenanceModal() {
+      const modal = document.getElementById('maintenance-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeMaintenanceModal() {
+      const modal = document.getElementById('maintenance-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    const NAV_ITEMS = [
+      { id: 'feed', label: '動態牆', icon: 'flame' },
+      { id: 'announcements', label: '班級公告', icon: 'megaphone' },
+      { id: 'homework', label: '功課清單', icon: 'calendar-check' },
+      { id: 'resources', label: '資源分享區', icon: 'folder-open' },
+      { id: 'classmates', label: '通訊錄', icon: 'users' }
+    ];
+
+    function renderNavigation() {
+      const desktopNav = document.getElementById('desktop-nav');
+      const mobileNav = document.getElementById('mobile-nav');
+
+      const createBtnHTML = (item, isMobile) => {
+        const isActive = appState.currentTab === item.id;
+        if (isMobile) {
+          return `
+            <button onclick="switchTab('${item.id}')" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 transition-all ${
+              isActive ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }">
+              <i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i>
+              ${item.label}
+            </button>
+          `;
+        }
+        return `
+          <button onclick="switchTab('${item.id}')" class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            isActive ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+          }">
+            <i data-lucide="${item.icon}" class="w-4 h-4"></i>
+            ${item.label}
+          </button>
+        `;
+      };
+
+      desktopNav.innerHTML = NAV_ITEMS.map(item => createBtnHTML(item, false)).join('');
+      mobileNav.innerHTML = NAV_ITEMS.map(item => createBtnHTML(item, true)).join('');
+      lucide.createIcons();
+    }
+
+    function switchTab(tabId) {
+      appState.currentTab = tabId;
+      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+      const activeSection = document.getElementById(`section-${tabId}`);
+      if (activeSection) {
+        activeSection.classList.remove('hidden');
+      }
+      renderNavigation();
+      
+      if (tabId === 'feed') renderFeed();
+      if (tabId === 'announcements') renderAnnouncements();
+      if (tabId === 'homework') renderHomeworkAndSchedule();
+      if (tabId === 'resources') renderResources();
+      if (tabId === 'classmates') renderClassmates();
+    }
+
+    function toggleLoginModal(show) {
+      const modal = document.getElementById('login-modal');
+      if (show) {
+        renderLoginUserList();
+        document.getElementById('login-password-input').value = '';
+        document.getElementById('login-error-msg').classList.add('hidden');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      lucide.createIcons();
+    }
+
+    function renderLoginUserList() {
+      const selectEl = document.getElementById('login-user-select');
+      selectEl.innerHTML = appState.classmates.map(user => `
+        <option value="${user.id}">${escapeHTML(user.seat)}號 - ${escapeHTML(user.name)} (${escapeHTML(user.role)})</option>
+      `).join('');
+      updateLoginHint();
+    }
+
+    function updateLoginHint() {
+      const selectedId = document.getElementById('login-user-select').value;
+      const user = appState.classmates.find(u => u.id === selectedId);
+      const hintEl = document.getElementById('login-password-hint');
+      if (!user) return;
+      if (user.isOfficer) {
+        hintEl.textContent = '管理員永久密碼（維護期間亦可登入）';
+      } else {
+        hintEl.textContent = user.password === 'stca0000' ? '初始預設密碼：stca0000' : '已設定自訂密碼（30天效期）';
+      }
+    }
+
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function isStudentPasswordExpired(user) {
+      if (!user || user.isOfficer) return false;
+      const elapsed = Date.now() - (user.passwordUpdatedAt || 0);
+      return elapsed >= THIRTY_DAYS_MS;
+    }
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const selectedId = document.getElementById('login-user-select').value;
+      const inputPw = document.getElementById('login-password-input').value;
+      const errEl = document.getElementById('login-error-msg');
+      const user = appState.classmates.find(u => u.id === selectedId);
+
+      // 維護期間僅允許管理員永晞登入解除或管理維護
+      if (isMaintenanceActive() && (!user || !user.isOfficer)) {
+        toggleLoginModal(false);
+        openMaintenanceModal();
+        showToast('系統例行維護期間，一般學生暫停登入服務！', 'warning');
+        return;
+      }
+
+      if (!user || inputPw !== user.password) {
+        errEl.textContent = '❌ 密碼錯誤，請重新確認後再試！';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      toggleLoginModal(false);
+
+      if (isStudentPasswordExpired(user)) {
+        appState.pendingForcePwUser = user;
+        openChangePasswordModal(true);
+        showToast(`${user.name} 同學，您的密碼已超過一個月有效期，請先更改密碼！`, 'warning');
+        return;
+      }
+
+      appState.currentUser = user;
+      sessionStorage.setItem(SESSION_USER_KEY, user.id);
+      refreshAllUI();
+      showToast(`歡迎回來，${user.name} (${user.role})！登入成功。`);
+    }
+
+    function openChangePasswordModal(isForced = false) {
+      const targetUser = isForced ? appState.pendingForcePwUser : appState.currentUser;
+      if (!targetUser) return;
+      if (targetUser.isOfficer) {
+        showToast('管理員「永晞」密碼為永久固定設定，無需更改。');
+        return;
+      }
+
+      const modal = document.getElementById('change-password-modal');
+      const closeBtn = document.getElementById('close-change-pw-btn');
+      const cancelBtn = document.getElementById('cancel-change-pw-btn');
+      const titleEl = document.getElementById('pw-modal-title');
+      const descEl = document.getElementById('pw-modal-desc');
+
+      document.getElementById('old-password-input').value = '';
+      document.getElementById('new-password-input').value = '';
+      document.getElementById('confirm-password-input').value = '';
+      document.getElementById('change-pw-error').classList.add('hidden');
+
+      if (isForced) {
+        closeBtn.classList.add('hidden');
+        cancelBtn.classList.add('hidden');
+        titleEl.textContent = `【強制更新】${targetUser.name} 同學請更改密碼`;
+        descEl.textContent = '您的密碼已超過 30 天（一個月）有效期。依 STCA 班級規定，必須完成更改密碼後方可進入系統互動。';
+      } else {
+        closeBtn.classList.remove('hidden');
+        cancelBtn.classList.remove('hidden');
+        titleEl.textContent = `更改 ${targetUser.name} 的登入密碼`;
+        descEl.textContent = '更新密碼後將同步至雲端並重新計算 30 天（一個月）有效期。';
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeChangePasswordModal() {
+      if (appState.pendingForcePwUser) return;
+      const modal = document.getElementById('change-password-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function handleChangePasswordSubmit(event) {
+      event.preventDefault();
+      const targetUser = appState.pendingForcePwUser || appState.currentUser;
+      if (!targetUser || targetUser.isOfficer) return;
+
+      const oldPw = document.getElementById('old-password-input').value;
+      const newPw = document.getElementById('new-password-input').value.trim();
+      const confirmPw = document.getElementById('confirm-password-input').value.trim();
+      const errEl = document.getElementById('change-pw-error');
+
+      if (oldPw !== targetUser.password) {
+        errEl.textContent = '❌ 目前舊密碼輸入不正確！';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (newPw.length < 6 || !/[A-Za-z]/.test(newPw) || !/[0-9]/.test(newPw)) {
+        errEl.textContent = '❌ 新密碼長度須至少 6 位，且必須同時包含英文字母與數字！';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (newPw === oldPw) {
+        errEl.textContent = '❌ 新密碼不可與舊密碼相同！';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (newPw !== confirmPw) {
+        errEl.textContent = '❌ 兩次輸入的新密碼不一致！';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      targetUser.password = newPw;
+      targetUser.passwordUpdatedAt = Date.now();
+      appState.currentUser = targetUser;
+      appState.pendingForcePwUser = null;
+      sessionStorage.setItem(SESSION_USER_KEY, targetUser.id);
+      await saveSharedStateToCloud();
+
+      const modal = document.getElementById('change-password-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+
+      refreshAllUI();
+      showToast('🎉 密碼更新成功並已同步至雲端！已重新計算 30 天有效期。');
+    }
+
+    function logout() {
+      appState.currentUser = null;
+      appState.pendingForcePwUser = null;
+      sessionStorage.removeItem(SESSION_USER_KEY);
+      refreshAllUI();
+      showToast('已登出，目前為訪客瀏覽模式。', 'warning');
+    }
+
+    function refreshAllUI() {
+      updateMaintenanceUI();
+      renderAuthStatus();
+      renderFeed();
+      renderAnnouncements();
+      renderHomeworkAndSchedule();
+      renderResources();
+      renderClassmates();
+    }
+
+    function renderAuthStatus() {
+      const container = document.getElementById('auth-status-container');
+      const footerStatus = document.getElementById('footer-auth-status');
+
+      if (isMaintenanceActive() && (!appState.currentUser || !appState.currentUser.isOfficer)) {
+        footerStatus.textContent = '目前狀態：系統例行維護中（僅管理員永晞可登入管理）';
+        container.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <button onclick="openMaintenanceModal()" class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold px-3 py-2 rounded-xl">
+              <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+              <span>維護中</span>
+            </button>
+            <button onclick="toggleLoginModal(true)" title="管理員通道" class="inline-flex items-center gap-1 bg-slate-800 text-white text-xs font-semibold px-3 py-2 rounded-xl">
+              <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">管理員登入</span>
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      if (!appState.currentUser) {
+        footerStatus.textContent = '目前狀態：訪客瀏覽模式 (未登入・全班內容即時同步)';
+        container.innerHTML = `
+          <button onclick="toggleLoginModal(true)" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-md shadow-indigo-200 transition-all">
+            <i data-lucide="log-in" class="w-4 h-4"></i>
+            <span>成員登入</span>
+          </button>
+        `;
+      } else {
+        const user = appState.currentUser;
+        const nextExpireDate = new Date((user.passwordUpdatedAt || Date.now()) + THIRTY_DAYS_MS).toLocaleDateString('zh-Hant');
+        footerStatus.textContent = user.isOfficer
+          ? `目前登入：${user.name} (管理員・您取消或刪除的內容全班即時同步)`
+          : `目前登入：${user.name} (${user.role})・下次密碼到期日：${nextExpireDate}`;
+
+        container.innerHTML = `
+          <div class="flex items-center gap-1.5 bg-indigo-50/90 border border-indigo-200/80 rounded-2xl pl-2.5 pr-1.5 py-1.5">
+            <div class="w-7 h-7 rounded-full ${user.avatarBg} text-white text-xs font-bold flex items-center justify-center shrink-0">
+              ${user.name.charAt(0)}
+            </div>
+            <div class="hidden sm:flex flex-col text-left mr-1">
+              <span class="text-[10px] text-indigo-600 font-semibold leading-none mb-0.5">${user.role}</span>
+              <span class="text-xs font-bold text-slate-800">${user.name}</span>
+            </div>
+            ${!user.isOfficer ? `
+              <button onclick="openChangePasswordModal(false)" title="更改密碼（下次到期：${nextExpireDate}）" class="p-1.5 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors">
+                <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
+              </button>
+            ` : ''}
+            <button onclick="logout()" title="登出" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      }
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 3. 動態牆 (FEED) 邏輯
+    // ==========================================
+    const MOOD_CARDS = {
+      study: { emoji: '📚', title: '考前衝刺讀書會', desc: '圖書館 / 教室留校自習中' },
+      basketball: { emoji: '🏀', title: '放學球場三對三', desc: '歡迎熱血球友隨時加入' },
+      bubbletea: { emoji: '🧋', title: '團購手搖飲時間', desc: '飲料控集合！快來點單' },
+      lost: { emoji: '🔍', title: '尋找遺失物品', desc: '請大家幫忙留意教室與走廊' }
+    };
+
+    function handleMoodCardChange(val) {
+      const preview = document.getElementById('selected-card-preview');
+      if (!val || !MOOD_CARDS[val]) {
+        appState.selectedMoodCard = null;
+        if (preview) preview.classList.add('hidden');
+        return;
+      }
+      appState.selectedMoodCard = MOOD_CARDS[val];
+      const emojiEl = document.getElementById('preview-card-emoji');
+      const titleEl = document.getElementById('preview-card-title');
+      const descEl = document.getElementById('preview-card-desc');
+      if (emojiEl) emojiEl.textContent = MOOD_CARDS[val].emoji;
+      if (titleEl) titleEl.textContent = MOOD_CARDS[val].title;
+      if (descEl) descEl.textContent = MOOD_CARDS[val].desc;
+      if (preview) preview.classList.remove('hidden');
+    }
+
+    function clearSelectedCard() {
+      appState.selectedMoodCard = null;
+      const selectEl = document.getElementById('post-mood-card');
+      const preview = document.getElementById('selected-card-preview');
+      if (selectEl) selectEl.value = '';
+      if (preview) preview.classList.add('hidden');
+    }
+
+    async function createPost() {
+      if (!ensureCanInteract('發布貼文')) return;
+
+      const textarea = document.getElementById('post-content');
+      const content = textarea.value.trim();
+      if (!content) {
+        showToast('請先輸入貼文內容再發布喔！', 'warning');
+        textarea.focus();
+        return;
+      }
+
+      const user = appState.currentUser;
+      const nowTime = new Date().toLocaleTimeString('zh-Hant', { hour: '2-digit', minute: '2-digit' });
+      const newPost = {
+        id: 'p_' + Date.now(),
+        authorId: user.id,
+        authorName: user.name,
+        authorRole: user.role,
+        avatarBg: user.avatarBg,
+        tag: appState.selectedPostTag,
+        content: content,
+        card: appState.selectedMoodCard ? { ...appState.selectedMoodCard } : null,
+        timestamp: `今天 ${nowTime}`,
+        likes: 0,
+        likedByUsers: [],
+        comments: []
+      };
+
+      appState.posts.unshift(newPost);
+      textarea.value = '';
+      clearSelectedCard();
+      await saveSharedStateToCloud();
+      showToast('貼文已發布並同步給全班同學！');
+    }
+
+    function setFeedFilter(tag) {
+      appState.feedFilter = tag;
+      document.querySelectorAll('.feed-filter-btn').forEach(btn => {
+        if (btn.dataset.filter === tag) {
+          btn.className = 'feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white shrink-0 transition-colors';
+        } else {
+          btn.className = 'feed-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 shrink-0 transition-colors';
+        }
+      });
+      renderFeed();
+    }
+
+    async function toggleLike(postId) {
+      if (!ensureCanInteract('按讚貼文')) return;
+      const post = appState.posts.find(p => p.id === postId);
+      if (!post) return;
+      if (!Array.isArray(post.likedByUsers)) post.likedByUsers = [];
+
+      const uid = appState.currentUser.id;
+      const idx = post.likedByUsers.indexOf(uid);
+      if (idx > -1) {
+        post.likedByUsers.splice(idx, 1);
+        post.likes = Math.max(0, (post.likes || 1) - 1);
+      } else {
+        post.likedByUsers.push(uid);
+        post.likes = (post.likes || 0) + 1;
+      }
+      await saveSharedStateToCloud();
+    }
+
+    async function deletePost(postId) {
+      if (!appState.currentUser) return;
+      appState.posts = appState.posts.filter(p => p.id !== postId);
+      await saveSharedStateToCloud();
+      showToast('已刪除該則貼文，全班畫面已即時同步移除！');
+    }
+
+    async function deleteComment(postId, commentId) {
+      if (!appState.currentUser) return;
+      const post = appState.posts.find(p => p.id === postId);
+      if (!post) return;
+      post.comments = post.comments.filter(c => c.id !== commentId);
+      await saveSharedStateToCloud();
+      showToast('已移除該則留言，全班畫面已同步更新！');
+    }
+
+    async function addComment(event, postId) {
+      event.preventDefault();
+      if (!ensureCanInteract('留言回覆')) return;
+
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      const post = appState.posts.find(p => p.id === postId);
+      if (!post) return;
+
+      const user = appState.currentUser;
+      const nowTime = new Date().toLocaleTimeString('zh-Hant', { hour: '2-digit', minute: '2-digit' });
+      post.comments.push({
+        id: 'c_' + Date.now(),
+        authorId: user.id,
+        authorName: user.name,
+        authorRole: user.role,
+        text: text,
+        time: `今天 ${nowTime}`
+      });
+
+      await saveSharedStateToCloud();
+      const commentBox = document.getElementById(`comments-box-${postId}`);
+      if (commentBox) commentBox.classList.remove('hidden');
+    }
+
+    function toggleCommentsBox(postId) {
+      const box = document.getElementById(`comments-box-${postId}`);
+      if (box) box.classList.toggle('hidden');
+    }
+
+    function getTagBadgeStyle(tag) {
+      switch (tag) {
+        case '#課業討論': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        case '#活動揪團': return 'bg-amber-50 text-amber-800 border-amber-200';
+        case '#失物招領': return 'bg-rose-50 text-rose-700 border-rose-200';
+        default: return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      }
+    }
+
+    function renderFeed() {
+      const composerContainer = document.getElementById('composer-container');
+      if (isMaintenanceActive() && (!appState.currentUser || !appState.currentUser.isOfficer)) {
+        composerContainer.innerHTML = `
+          <div class="flex items-center justify-between gap-4 py-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 font-bold flex items-center justify-center shrink-0">
+                <i data-lucide="wrench" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-amber-900">系統例行維護中</p>
+                <p class="text-xs text-slate-500">維護期間暫停發布動態及留言服務，不便之處，敬請原諒。</p>
+              </div>
+            </div>
+            <button onclick="openMaintenanceModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-amber-800 hover:bg-amber-900 text-white shadow-sm shrink-0">
+              維護通告
+            </button>
+          </div>
+        `;
+      } else if (!appState.currentUser) {
+        composerContainer.innerHTML = `
+          <div class="flex items-center justify-between gap-4 py-2">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-500 font-bold flex items-center justify-center shrink-0">
+                <i data-lucide="user-x" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-slate-800">目前為訪客瀏覽模式（全班雲端同步）</p>
+                <p class="text-xs text-slate-400">登入後即可在動態牆發文、按讚與留言交流</p>
+              </div>
+            </div>
+            <button onclick="toggleLoginModal(true)" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shrink-0">
+              立即登入
+            </button>
+          </div>
+        `;
+      } else {
+        const user = appState.currentUser;
+        composerContainer.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full ${user.avatarBg} text-white font-bold flex items-center justify-center shrink-0 shadow-sm">
+              ${user.name.charAt(0)}
+            </div>
+            <div class="flex-1 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-700">以 <span class="text-indigo-600 font-bold">${escapeHTML(user.name)}</span> (${escapeHTML(user.role)}) 身分發佈動態</span>
+                <span class="text-xs text-emerald-600 font-medium">發布後全班即時可見</span>
+              </div>
+              <textarea id="post-content" rows="3" placeholder="分享班上新鮮事、討論功課難題，或揪團下課去打球吧..." class="w-full rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all resize-none"></textarea>
+              
+              <!-- 預覽選擇的圖片卡片 -->
+              <div id="selected-card-preview" class="hidden relative rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <span id="preview-card-emoji" class="text-2xl">📸</span>
+                  <div>
+                    <p id="preview-card-title" class="text-xs font-bold text-slate-700">已附加主題卡片</p>
+                    <p id="preview-card-desc" class="text-[11px] text-slate-500">點擊右側可移除</p>
+                  </div>
+                </div>
+                <button type="button" onclick="clearSelectedCard()" class="text-xs text-rose-500 hover:text-rose-700 font-medium px-2 py-1 rounded-lg hover:bg-rose-50">移除</button>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                <div class="flex flex-wrap items-center gap-1.5" id="post-tag-selector">
+                  <button type="button" data-tag="#日常閒聊" onclick="setPostTag('#日常閒聊', this)" class="post-tag-btn active px-2.5 py-1 rounded-lg text-xs font-medium ${appState.selectedPostTag === '#日常閒聊' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'} transition-all">#日常閒聊</button>
+                  <button type="button" data-tag="#課業討論" onclick="setPostTag('#課業討論', this)" class="post-tag-btn px-2.5 py-1 rounded-lg text-xs font-medium ${appState.selectedPostTag === '#課業討論' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'} transition-all">#課業討論</button>
+                  <button type="button" data-tag="#活動揪團" onclick="setPostTag('#活動揪團', this)" class="post-tag-btn px-2.5 py-1 rounded-lg text-xs font-medium ${appState.selectedPostTag === '#活動揪團' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'} transition-all">#活動揪團</button>
+                  <button type="button" data-tag="#失物招領" onclick="setPostTag('#失物招領', this)" class="post-tag-btn px-2.5 py-1 rounded-lg text-xs font-medium ${appState.selectedPostTag === '#失物招領' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'} transition-all">#失物招領</button>
+                </div>
+
+                <div class="flex items-center gap-2 ml-auto">
+                  <select id="post-mood-card" onchange="handleMoodCardChange(this.value)" class="text-xs bg-amber-50 text-amber-800 border border-amber-200 rounded-xl px-2.5 py-2 font-medium focus:outline-none cursor-pointer">
+                    <option value="">✨ 附加心情/情境卡</option>
+                    <option value="study">📚 考前衝刺讀書會</option>
+                    <option value="basketball">🏀 放學球場三對三</option>
+                    <option value="bubbletea">🧋 團購手搖飲時間</option>
+                    <option value="lost">🔍 尋找遺失物品</option>
+                  </select>
+
+                  <button type="button" onclick="createPost()" class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm shadow-indigo-200 transition-all">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    發布貼文
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const listEl = document.getElementById('feed-list');
+      const keyword = (document.getElementById('feed-search')?.value || '').trim().toLowerCase();
+
+      const filteredPosts = appState.posts.filter(post => {
+        const matchTag = appState.feedFilter === 'ALL' || post.tag === appState.feedFilter;
+        const matchKeyword = !keyword || 
+          post.content.toLowerCase().includes(keyword) || 
+          post.authorName.toLowerCase().includes(keyword) ||
+          post.tag.toLowerCase().includes(keyword);
+        return matchTag && matchKeyword;
+      });
+
+      if (filteredPosts.length === 0) {
+        listEl.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-10 text-center space-y-2">
+            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <i data-lucide="message-square-off" class="w-6 h-6"></i>
+            </div>
+            <p class="text-sm font-bold text-slate-700">目前沒有符合條件的動態貼文</p>
+            <p class="text-xs text-slate-400">試試看切換其他標籤分類，或登入後成為第一個發文的人吧！</p>
+          </div>
+        `;
+        renderSidebarWidgets();
+        lucide.createIcons();
+        return;
+      }
+
+      listEl.innerHTML = filteredPosts.map(post => {
+        const canDeletePost = appState.currentUser && (post.authorId === appState.currentUser.id || appState.currentUser.isOfficer);
+        const likedByMe = appState.currentUser && Array.isArray(post.likedByUsers) && post.likedByUsers.includes(appState.currentUser.id);
+        return `
+          <article class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5 transition-all hover:border-slate-300/90">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full ${post.avatarBg || 'bg-indigo-600'} text-white font-bold flex items-center justify-center shrink-0">
+                  ${post.authorName.charAt(0)}
+                </div>
+                <div>
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="font-bold text-slate-900 text-sm">${escapeHTML(post.authorName)}</span>
+                    <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">${escapeHTML(post.authorRole)}</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-0.5">${escapeHTML(post.timestamp)}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${getTagBadgeStyle(post.tag)}">
+                  ${escapeHTML(post.tag)}
+                </span>
+                ${canDeletePost ? `
+                  <button onclick="deletePost('${post.id}')" title="${appState.currentUser.isOfficer ? '管理員移除貼文（全班同步）' : '刪除我的貼文'}" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+
+            <div class="mt-3.5 text-sm text-slate-800 leading-relaxed whitespace-pre-line">${escapeHTML(post.content)}</div>
+
+            ${post.card ? `
+              <div class="mt-3.5 rounded-xl bg-gradient-to-r from-indigo-50/90 to-amber-50/70 border border-indigo-100/80 p-3.5 flex items-center gap-3">
+                <span class="text-2xl bg-white w-11 h-11 rounded-xl flex items-center justify-center shadow-xs shrink-0">${post.card.emoji}</span>
+                <div>
+                  <p class="text-xs font-bold text-slate-900">${escapeHTML(post.card.title)}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">${escapeHTML(post.card.desc)}</p>
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <button onclick="toggleLike('${post.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  likedByMe 
+                    ? 'bg-rose-50 text-rose-600 border border-rose-200' 
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-transparent'
+                }">
+                  <span>${likedByMe ? '❤️' : '🤍'}</span>
+                  <span>讚 (${post.likes || 0})</span>
+                </button>
+
+                <button onclick="toggleCommentsBox('${post.id}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-all">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                  <span>留言 (${(post.comments || []).length})</span>
+                </button>
+              </div>
+            </div>
+
+            <div id="comments-box-${post.id}" class="mt-3 pt-3 border-t border-slate-100 space-y-3 ${(post.comments || []).length === 0 ? 'hidden' : ''}">
+              <div class="space-y-2">
+                ${(post.comments || []).map(c => {
+                  const canDelComment = appState.currentUser && (appState.currentUser.isOfficer || c.authorId === appState.currentUser.id);
+                  return `
+                    <div class="bg-slate-50/90 rounded-xl px-3.5 py-2.5 text-xs">
+                      <div class="flex items-center justify-between mb-1">
+                        <span class="font-bold text-slate-800">${escapeHTML(c.authorName)} <span class="font-normal text-slate-400">(${escapeHTML(c.authorRole)})</span></span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-[10px] text-slate-400">${escapeHTML(c.time)}</span>
+                          ${canDelComment ? `
+                            <button onclick="deleteComment('${post.id}', '${c.id}')" title="移除留言（全班同步）" class="text-slate-400 hover:text-rose-600">
+                              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                            </button>
+                          ` : ''}
+                        </div>
+                      </div>
+                      <p class="text-slate-700 leading-relaxed">${escapeHTML(c.text)}</p>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              <form onsubmit="addComment(event, '${post.id}')" class="flex items-center gap-2">
+                <input type="text" id="comment-input-${post.id}" placeholder="${appState.currentUser ? `以 ${appState.currentUser.name} 的身分回覆...` : '請先登入後才能留言...'}" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:bg-white focus:border-indigo-500 focus:outline-none">
+                <button type="submit" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-colors shrink-0">
+                  送出
+                </button>
+              </form>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      renderSidebarWidgets();
+      lucide.createIcons();
+    }
+
+    function setPostTag(tag, btn) {
+      appState.selectedPostTag = tag;
+      document.querySelectorAll('.post-tag-btn').forEach(b => {
+        b.className = 'post-tag-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 transition-all';
+      });
+      btn.className = 'post-tag-btn active px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white transition-all';
+    }
+
+    function renderSidebarWidgets() {
+      const pinned = appState.announcements.find(a => a.priority === 'pinned') || appState.announcements[0];
+      const sidebarAnn = document.getElementById('sidebar-pinned-announcement');
+      if (pinned) {
+        sidebarAnn.innerHTML = `
+          <h4 class="font-bold text-sm leading-snug">${escapeHTML(pinned.title)}</h4>
+          <p class="text-xs text-indigo-100 line-clamp-3 leading-relaxed">${escapeHTML(pinned.content)}</p>
+          <p class="text-[11px] text-indigo-200 pt-1">發布者：${escapeHTML(pinned.author)}</p>
+        `;
+      } else {
+        sidebarAnn.innerHTML = `<p class="text-xs text-indigo-100">目前暫無置頂班級公告。</p>`;
+      }
+
+      const total = appState.homework.length;
+      const done = appState.homework.filter(h => h.completed).length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+      const upcoming = appState.homework.filter(h => !h.completed).slice(0, 2);
+
+      document.getElementById('sidebar-hw-progress').innerHTML = `
+        <div>
+          <div class="flex justify-between text-xs font-semibold mb-1.5">
+            <span class="text-slate-600">已完成 ${done}/${total} 項</span>
+            <span class="text-indigo-600">${pct}%</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+          </div>
+        </div>
+        <div class="space-y-1.5 pt-1">
+          ${upcoming.length > 0 ? upcoming.map(h => `
+            <div class="flex items-center justify-between text-xs bg-slate-50 px-2.5 py-2 rounded-lg">
+              <span class="truncate font-medium text-slate-700 pr-2">[${escapeHTML(h.subject)}] ${escapeHTML(h.task)}</span>
+              <span class="text-[10px] text-amber-600 font-semibold shrink-0">${h.due.slice(5)}</span>
+            </div>
+          `).join('') : '<p class="text-xs text-emerald-600 font-medium">🎉 太棒了！目前功課全數完成！</p>'}
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // 4. 班級公告 (ANNOUNCEMENTS) 邏輯
+    // ==========================================
+    function toggleAnnouncementForm(show) {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) {
+        if (show) {
+          toggleLoginModal(true);
+          showToast('僅管理員（永晞）可發布公告！', 'warning');
+        }
+        return;
+      }
+      const form = document.getElementById('new-announcement-form');
+      if (show) form.classList.remove('hidden');
+      else form.classList.add('hidden');
+    }
+
+    async function addAnnouncement() {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) return;
+
+      const title = document.getElementById('ann-title').value.trim();
+      const content = document.getElementById('ann-content').value.trim();
+      const priority = document.getElementById('ann-priority').value;
+
+      if (!title || !content) {
+        showToast('請完整填寫公告標題與內容', 'warning');
+        return;
+      }
+
+      const user = appState.currentUser;
+      const today = new Date().toISOString().split('T')[0];
+
+      appState.announcements.unshift({
+        id: 'a_' + Date.now(),
+        title: priority === 'pinned' && !title.startsWith('📌') ? `📌 ${title}` : title,
+        content,
+        author: `${user.name} (${user.role})`,
+        date: today,
+        priority
+      });
+
+      document.getElementById('ann-title').value = '';
+      document.getElementById('ann-content').value = '';
+      toggleAnnouncementForm(false);
+      await saveSharedStateToCloud();
+      showToast('新班級公告已發布，全班所有成員畫面已即時同步！');
+    }
+
+    function renderAnnouncements() {
+      const actionArea = document.getElementById('announcement-action-area');
+
+      if (appState.currentUser && appState.currentUser.isOfficer) {
+        actionArea.innerHTML = `
+          <button onclick="toggleAnnouncementForm(true)" class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> 新增班級公告
+          </button>
+        `;
+      } else {
+        actionArea.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100 px-3 py-2 rounded-xl">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i> 僅管理員（永晞）可發布或取消公告
+          </span>
+        `;
+        const form = document.getElementById('new-announcement-form');
+        if (form) form.classList.add('hidden');
+      }
+
+      const listEl = document.getElementById('announcements-list');
+      if (appState.announcements.length === 0) {
+        listEl.innerHTML = `
+          <div class="md:col-span-2 bg-white rounded-2xl border border-slate-200/80 p-10 text-center space-y-2">
+            <p class="text-sm font-bold text-slate-700">目前沒有任何班級公告</p>
+            <p class="text-xs text-slate-400">管理員發布新公告後將立即顯示於此處。</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const sorted = [...appState.announcements].sort((a, b) => (a.priority === 'pinned' ? -1 : 1));
+      const canDelete = appState.currentUser && appState.currentUser.isOfficer;
+
+      listEl.innerHTML = sorted.map(ann => {
+        const isPinned = ann.priority === 'pinned';
+        return `
+          <div class="rounded-2xl p-5 border transition-all flex flex-col justify-between ${
+            isPinned 
+              ? 'bg-gradient-to-br from-amber-50/70 via-white to-indigo-50/40 border-amber-200/90 shadow-sm' 
+              : 'bg-white border-slate-200/80 shadow-xs'
+          }">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-2.5">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                  isPinned ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
+                }">
+                  ${isPinned ? '置頂重要通知' : '一般公告'}
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-400">${escapeHTML(ann.date)}</span>
+                  ${canDelete ? `
+                    <button onclick="deleteAnnouncement('${ann.id}')" title="管理員取消/刪除公告（全班同步移除）" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 取消公告
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+              <h3 class="font-bold text-slate-900 text-base leading-snug mb-2">${escapeHTML(ann.title)}</h3>
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">${escapeHTML(ann.content)}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span class="font-medium flex items-center gap-1.5">
+                <i data-lucide="user-check" class="w-3.5 h-3.5 text-indigo-500"></i>
+                發布者：${escapeHTML(ann.author)}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function deleteAnnouncement(annId) {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) return;
+      appState.announcements = appState.announcements.filter(a => a.id !== annId);
+      await saveSharedStateToCloud();
+      showToast('管理員已取消該則公告，全班所有人的畫面已同步移除！');
+    }
+
+    // ==========================================
+    // 5. 功課清單 (HOMEWORK) 邏輯
+    // ==========================================
+    async function toggleHomework(hwId) {
+      if (!ensureCanInteract('勾選功課進度')) return;
+      const item = appState.homework.find(h => h.id === hwId);
+      if (!item) return;
+      item.completed = !item.completed;
+      await saveSharedStateToCloud();
+      if (item.completed) {
+        showToast(`太棒了！已完成「${item.subject}」功課 🎉`);
+      }
+    }
+
+    async function addHomework(event) {
+      event.preventDefault();
+      if (!ensureCanInteract('新增作業')) return;
+
+      const subject = document.getElementById('hw-subject').value;
+      const task = document.getElementById('hw-task').value.trim();
+      const due = document.getElementById('hw-due').value;
+
+      if (!task || !due) return;
+
+      appState.homework.unshift({
+        id: 'h_' + Date.now(),
+        subject,
+        task,
+        due,
+        completed: false
+      });
+
+      document.getElementById('hw-task').value = '';
+      await saveSharedStateToCloud();
+      showToast('已新增待辦功課並同步至全班清單！');
+    }
+
+    async function deleteHomework(hwId) {
+      if (!appState.currentUser) return;
+      appState.homework = appState.homework.filter(h => h.id !== hwId);
+      await saveSharedStateToCloud();
+      showToast('已取消該項功課，全班清單已同步移除！');
+    }
+
+    function renderHomeworkAndSchedule() {
+      const total = appState.homework.length;
+      const done = appState.homework.filter(h => h.completed).length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      document.getElementById('hw-completion-badge').textContent = `已完成 ${done} / ${total} 項 (${pct}%)`;
+      document.getElementById('hw-progress-bar').style.width = `${pct}%`;
+
+      const hwComposerWrapper = document.getElementById('hw-composer-wrapper');
+      if (!appState.currentUser) {
+        hwComposerWrapper.innerHTML = `
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 mb-5 text-center space-y-2">
+            <p class="text-xs text-slate-500 font-medium">目前為訪客瀏覽模式（內容與全班即時同步），登入後可新增或勾選作業。</p>
+            <button onclick="toggleLoginModal(true)" class="px-4 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold shadow-xs">
+              登入以參與互動
+            </button>
+          </div>
+        `;
+      } else {
+        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+        hwComposerWrapper.innerHTML = `
+          <form onsubmit="addHomework(event)" class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 mb-5 grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <div class="sm:col-span-3">
+              <select id="hw-subject" class="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold text-slate-700 focus:border-indigo-500 focus:outline-none">
+                <option value="數學">📐 數學</option>
+                <option value="英文">🔤 英文</option>
+                <option value="中文/國文">📖 中文/國文</option>
+                <option value="物理/理化">⚛️ 物理/理化</option>
+                <option value="資訊科技">💻 資訊科技</option>
+                <option value="通識/公民">🌏 通識/公民</option>
+              </select>
+            </div>
+            <div class="sm:col-span-5">
+              <input type="text" id="hw-task" required placeholder="輸入功課範圍或小考內容..." class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+              <input type="date" id="hw-due" value="${tomorrow}" required class="w-full rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs text-slate-600 focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div class="sm:col-span-2">
+              <button type="submit" class="w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-1">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增
+              </button>
+            </div>
+          </form>
+        `;
+      }
+
+      const listEl = document.getElementById('homework-list');
+      if (appState.homework.length === 0) {
+        listEl.innerHTML = `<p class="text-center text-xs text-slate-400 py-8">目前沒有任何待辦功課項目。</p>`;
+        lucide.createIcons();
+        return;
+      }
+
+      listEl.innerHTML = appState.homework.map(hw => `
+        <div class="flex items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${
+          hw.completed ? 'bg-slate-50/70 border-slate-200/60 opacity-75' : 'bg-white border-slate-200 hover:border-indigo-300 shadow-2xs'
+        }">
+          <label class="flex items-start gap-3 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" ${hw.completed ? 'checked' : ''} onchange="toggleHomework('${hw.id}')" class="mt-1 w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 text-indigo-700">${escapeHTML(hw.subject)}</span>
+                <span class="text-xs font-medium text-amber-600 flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3 h-3"></i> 截止：${escapeHTML(hw.due)}
+                </span>
+              </div>
+              <p class="text-sm font-medium mt-1 break-words ${hw.completed ? 'line-through text-slate-400' : 'text-slate-800'}">
+                ${escapeHTML(hw.task)}
+              </p>
+            </div>
+          </label>
+          ${appState.currentUser ? `
+            <button onclick="deleteHomework('${hw.id}')" title="取消/刪除作業（全班同步）" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors shrink-0">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          ` : ''}
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 6. 資源分享區 (RESOURCES) 邏輯
+    // ==========================================
+    function toggleResourceModal(show) {
+      if (show && !ensureCanInteract('分享學習資源')) return;
+      const panel = document.getElementById('new-resource-panel');
+      if (show) panel.classList.remove('hidden');
+      else panel.classList.add('hidden');
+    }
+
+    function setResourceFilter(cat) {
+      appState.resourceFilter = cat;
+      document.querySelectorAll('.res-filter-btn').forEach(btn => {
+        if (btn.dataset.rcat === cat) {
+          btn.className = 'res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white shrink-0';
+        } else {
+          btn.className = 'res-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 shrink-0';
+        }
+      });
+      renderResources();
+    }
+
+    async function addResource(event) {
+      event.preventDefault();
+      if (!appState.currentUser) return;
+
+      const title = document.getElementById('res-title').value.trim();
+      const category = document.getElementById('res-category').value;
+      const desc = document.getElementById('res-desc').value.trim();
+      const url = document.getElementById('res-url').value.trim();
+
+      if (!title || !desc) return;
+
+      const user = appState.currentUser;
+      const today = new Date().toISOString().split('T')[0];
+
+      appState.resources.unshift({
+        id: 'r_' + Date.now(),
+        title,
+        category,
+        desc,
+        author: `${user.name} (${user.role})`,
+        date: today,
+        url: url || 'https://drive.google.com/'
+      });
+
+      document.getElementById('res-title').value = '';
+      document.getElementById('res-desc').value = '';
+      toggleResourceModal(false);
+      await saveSharedStateToCloud();
+      showToast('感謝分享！新學習資源已同步給全班 🎉');
+    }
+
+    async function deleteResource(resId) {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) return;
+      appState.resources = appState.resources.filter(r => r.id !== resId);
+      await saveSharedStateToCloud();
+      showToast('管理員已移除該項資源，全班畫面已同步更新！');
+    }
+
+    function getCategoryIconAndColor(cat) {
+      switch (cat) {
+        case '數學': return { icon: 'calculator', bg: 'bg-indigo-100 text-indigo-600' };
+        case '英文': return { icon: 'languages', bg: 'bg-sky-100 text-sky-600' };
+        case '中文/國文': return { icon: 'book-open', bg: 'bg-amber-100 text-amber-700' };
+        case '理科': return { icon: 'flask-conical', bg: 'bg-emerald-100 text-emerald-600' };
+        case '班級相簿': return { icon: 'image', bg: 'bg-rose-100 text-rose-600' };
+        default: return { icon: 'file-text', bg: 'bg-slate-100 text-slate-600' };
+      }
+    }
+
+    function renderResources() {
+      const actionArea = document.getElementById('resource-action-area');
+      actionArea.innerHTML = `
+        <button onclick="toggleResourceModal(true)" class="inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all shrink-0">
+          <i data-lucide="upload-cloud" class="w-4 h-4"></i> 分享新資源
+        </button>
+      `;
+
+      const grid = document.getElementById('resources-grid');
+      const filtered = appState.resources.filter(r => 
+        appState.resourceFilter === 'ALL' || r.category === appState.resourceFilter
+      );
+      const isAdmin = appState.currentUser && appState.currentUser.isOfficer;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="md:col-span-3 bg-white rounded-2xl border border-slate-200/80 p-10 text-center text-xs text-slate-400">目前此分類暫無分享資源。</div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(res => {
+        const meta = getCategoryIconAndColor(res.category);
+        return `
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div class="w-10 h-10 rounded-xl ${meta.bg} flex items-center justify-center">
+                  <i data-lucide="${meta.icon}" class="w-5 h-5"></i>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                    ${escapeHTML(res.category)}
+                  </span>
+                  ${isAdmin ? `
+                    <button onclick="deleteResource('${res.id}')" title="管理員移除資源（全班同步）" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
+                      <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+              <h3 class="font-bold text-slate-900 text-base leading-snug mb-1.5">${escapeHTML(res.title)}</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">${escapeHTML(res.desc)}</p>
+            </div>
+
+            <div class="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div class="text-[11px] text-slate-400">
+                <p class="font-medium text-slate-600">${escapeHTML(res.author)}</p>
+                <p>${escapeHTML(res.date)}</p>
+              </div>
+              <a href="${escapeHTML(res.url)}" target="_blank" rel="noopener noreferrer" onclick="showToast('正在開啟外部雲端資源連結...')" class="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white transition-colors">
+                開啟連結 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 7. 班級通訊錄 (CLASSMATES) 邏輯
+    // ==========================================
+    function copyContact(text, label) {
+      const tempInput = document.createElement('input');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast(`已複製 ${label}：${text}`);
+      } catch (err) {
+        showToast('複製失敗，請手動選取複製', 'warning');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    function renderClassmates() {
+      const grid = document.getElementById('classmates-grid');
+      const query = (document.getElementById('classmate-search')?.value || '').trim().toLowerCase();
+
+      const filtered = appState.classmates.filter(m => {
+        if (!query) return true;
+        return (
+          m.name.toLowerCase().includes(query) ||
+          m.seat.includes(query) ||
+          m.role.toLowerCase().includes(query) ||
+          m.interests.some(tag => tag.toLowerCase().includes(query))
+        );
+      });
+
+      grid.innerHTML = filtered.map(member => `
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:border-indigo-200 transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl ${member.avatarBg} text-white font-bold text-lg flex items-center justify-center shrink-0 shadow-xs">
+                ${member.name.charAt(0)}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">${member.seat} 號</span>
+                  <h3 class="font-bold text-slate-900 text-base">${escapeHTML(member.name)}</h3>
+                </div>
+                <p class="text-xs font-semibold mt-0.5 ${member.isOfficer ? 'text-amber-600' : 'text-slate-500'}">
+                  ${member.isOfficer ? '⭐ ' : ''}${escapeHTML(member.role)}
+                </p>
+              </div>
+            </div>
+
+            <p class="mt-3.5 text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl">
+              ${escapeHTML(member.bio)}
+            </p>
+
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              ${member.interests.map(tag => `
+                <span class="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-indigo-50/70 text-indigo-700">
+                  #${escapeHTML(tag)}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+            <button onclick="copyContact('${escapeHTML(member.ig)}', 'IG 帳號')" class="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-pink-50 text-slate-600 hover:text-pink-600 font-medium transition-colors truncate">
+              <i data-lucide="instagram" class="w-3.5 h-3.5 shrink-0"></i>
+              <span class="truncate">${escapeHTML(member.ig)}</span>
+            </button>
+            <button onclick="copyContact('${escapeHTML(member.discord)}', 'Discord')" class="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 font-medium transition-colors truncate">
+              <i data-lucide="message-square" class="w-3.5 h-3.5 shrink-0"></i>
+              <span class="truncate">${escapeHTML(member.discord)}</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // 8. 工具函式與全域事件綁定
+    // ==========================================
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgClass = type === 'warning' ? 'bg-amber-600' : 'bg-slate-900';
+      toast.className = `${bgClass} text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in pointer-events-auto`;
+      toast.innerHTML = `
+        <span>${type === 'warning' ? '⚠️' : '✨'}</span>
+        <span>${escapeHTML(message)}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        toast.style.transition = 'all 0.2s ease';
+        setTimeout(() => toast.remove(), 200);
+      }, 2800);
+    }
+
+    function openResetModal() {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) {
+        showToast('僅管理員「永晞」可重置全班雲端資料！', 'warning');
+        return;
+      }
+      const modal = document.getElementById('reset-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeResetModal() {
+      const modal = document.getElementById('reset-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function confirmResetData() {
+      if (!appState.currentUser || !appState.currentUser.isOfficer) return;
+      appState.simulatedMaintenance = false;
+      appState.classmates = JSON.parse(JSON.stringify(DEFAULT_CLASSMATES));
+      appState.posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
+      appState.announcements = JSON.parse(JSON.stringify(DEFAULT_ANNOUNCEMENTS));
+      appState.homework = JSON.parse(JSON.stringify(DEFAULT_HOMEWORK));
+      appState.resources = JSON.parse(JSON.stringify(DEFAULT_RESOURCES));
+      await saveSharedStateToCloud();
+      closeResetModal();
+      showToast('已重置全班雲端資料，所有同學畫面已同步更新！');
+    }
+
+    // 將所有 HTML onclick / onsubmit 呼叫的函式暴露到 window 作用域
+    Object.assign(window, {
+      switchTab,
+      toggleLoginModal,
+      updateLoginHint,
+      togglePasswordVisibility,
+      handleLoginSubmit,
+      openChangePasswordModal,
+      closeChangePasswordModal,
+      handleChangePasswordSubmit,
+      logout,
+      toggleSimulatedMaintenance,
+      openMaintenanceModal,
+      closeMaintenanceModal,
+      handleMoodCardChange,
+      clearSelectedCard,
+      createPost,
+      setFeedFilter,
+      setPostTag,
+      toggleLike,
+      deletePost,
+      deleteComment,
+      addComment,
+      toggleCommentsBox,
+      toggleAnnouncementForm,
+      addAnnouncement,
+      deleteAnnouncement,
+      toggleHomework,
+      addHomework,
+      deleteHomework,
+      toggleResourceModal,
+      setResourceFilter,
+      addResource,
+      deleteResource,
+      copyContact,
+      renderFeed,
+      renderClassmates,
+      openResetModal,
+      closeResetModal,
+      confirmResetData
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderNavigation();
+      refreshAllUI();
+      initCloudSync();
+      if (isMaintenanceActive()) {
+        openMaintenanceModal();
+      }
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

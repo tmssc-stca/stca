@@ -1,0 +1,16 @@
+{
+  "name": "STCA 班級交流空間",
+  "short_name": "STCA",
+  "description": "STCA 班級交流空間 | 智能科技與電腦應用",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#012a30",
+  "theme_color": "#012a30",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
